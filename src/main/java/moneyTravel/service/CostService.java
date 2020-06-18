@@ -36,21 +36,7 @@ public class CostService {
 	public CostService(CostRepository repository) {
 		this.repository = repository;
 	}
-	/*
-	public List<Pharmacy> getPharmacy(String id) {
-		List<Pharmacy> newPharmacies = new ArrayList<Pharmacy>();
-		Pharmacy pharmacy = handler.getPharmacy(id);
-		if(getNote(id) != Null) {
-			Note note = getNote(id);
-			pharmacy.setNote(note.getNote());
-		}
-		else {
-			pharmacy.setNote("null");
-		}
-		newPharmacies.add(pharmacy);
-		return newPharmacies;
-	}
-	*/
+	
 	public List<Cost> getCosts(String date) {
 		Sort.Direction direction = Sort.Direction.DESC;
 		Sort sort = null;
@@ -95,11 +81,7 @@ public class CostService {
 	public Cost getCost(String id) throws NotFoundException {
 		return repository.findById(id).orElseThrow(() -> new NotFoundException());
 	}
-	/*
-	public List<Note> getAllNote(){
-		return repository.findAll();
-	}
-	*/
+	
 	public Cost createCost(CostRequest request) {
 		Cost cost = new Cost();
 		cost.setTime(request.getTime());
@@ -131,13 +113,4 @@ public class CostService {
 	public void deleteNote(String id) {
 		repository.deleteById(id);
 	}
-	
-	/*public List<Pharmacy> getPharmacies(QueryParameter param){
-		
-	}*/
-	
-	/*public boolean isLeapYear(int year) {
-		
-	}*/
-	
 }

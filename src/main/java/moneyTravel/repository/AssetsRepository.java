@@ -2,13 +2,12 @@ package moneyTravel.repository;
 
 import java.util.List;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import moneyTravel.entity.Cost;
+import moneyTravel.entity.Assets;
+
 
 @Repository
-public interface CostRepository extends MongoRepository<Cost, String> {
-	List<Cost> findAll(Sort sort); 
+public interface AssetsRepository extends MongoRepository<Assets, String> {
 }

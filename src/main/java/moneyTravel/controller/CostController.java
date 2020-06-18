@@ -33,21 +33,15 @@ public class CostController{
 	@Autowired
 	private CostService costService;
 	
-	@GetMapping(value = "/hello")
-	public String hello() {
-		return "hello";
-	}
-	/*
+	
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<List<Cost>> getPharmacy(@PathVariable("id") String id) {
-		return null;
-		List<Cost> pharmacy = costService.getPharmacy(id);
-		return ResponseEntity.ok(pharmacy);
-		
-	}*/
+	public ResponseEntity<Cost> getCost(@PathVariable("id") String id) throws NotFoundException {
+		Cost cost = costService.getCost(id);
+		return ResponseEntity.ok(cost);
+	}
 	
 	@GetMapping
-	public ResponseEntity<List<Cost>> findPharmacies(@RequestParam("date") String date) {
+	public ResponseEntity<List<Cost>> findCost(@RequestParam("date") String date) {
 		List<Cost> costs = costService.getCosts(date);
 		return ResponseEntity.ok(costs);
 		
@@ -64,9 +58,6 @@ public class CostController{
 	
 	@PutMapping(value = "/{id}/update")
 	public ResponseEntity<Cost> replaceCost(@PathVariable("id") String id, @Valid @RequestBody CostRequest request) throws NotFoundException{
-		System.out.println(id);
-		System.out.println(request);
-		
 		Cost cost = costService.replaceCost(id, request);
 		return ResponseEntity.ok(cost);	
 	}
