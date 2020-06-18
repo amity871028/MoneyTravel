@@ -88,17 +88,30 @@ async function getCost(){
 			let tmpCost = parseInt(cost.innerHTML);
 			tmpCost -= eachCost.cost;
 			cost.innerHTML = tmpCost;
+
+			const sumCost = document.getElementById('sum-cost');
+			tmpCost = parseInt(sumCost.innerHTML);
+			tmpCost -= eachCost.cost;
+			sumCost.innerHTML = tmpCost;
 		}
 		else {
 			const income = document.getElementById(`income-${date}`);
 			let tmpCost = parseInt(income.innerHTML);
 			tmpCost += eachCost.cost;
 			income.innerHTML = tmpCost;
+			
+			const sumIncome = document.getElementById('sum-income');
+			tmpCost = parseInt(sumIncome.innerHTML);
+			tmpCost += eachCost.cost;
+			sumIncome.innerHTML = tmpCost;
 		}
 
 	tbody.innerHTML += tmp;
 	});
-	
+	const sum = document.getElementById('sum');
+	const sumCost = document.getElementById('sum-cost').innerHTML;
+	const sumIncome = document.getElementById('sum-income').innerHTML;
+	sum.innerHTML = parseInt(sumIncome) - parseInt(sumCost);
 }
 
 async function updateCost(id){
@@ -147,6 +160,7 @@ async function newCost(){
 		let categorySelectedIndex = categorySelection.selectedIndex;
 		let categoryValue = categorySelection.options[categorySelectedIndex].value;
 
+		console.log(timestamp);
 		let cost = parseInt(document.getElementById('cost-cost').value);
 		if(Object.keys(category).find(element => element == categoryValue)) cost *= -1;
 		const result = await FetchData.post(costAPI.new, {
