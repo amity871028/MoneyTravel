@@ -1,0 +1,20 @@
+#list thead {
+    background-color: lightgoldenrodyellow;
+}
+
+.assets {
+    font-size: smaller;
+    color: gray;
+}
+
+.date {
+	font-size: xx-large;
+}
+
+.income {
+    color: blue;
+}
+
+.cost {
+    color: red;
+}
