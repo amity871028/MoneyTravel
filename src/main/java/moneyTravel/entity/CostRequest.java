@@ -9,8 +9,7 @@ public class CostRequest {
 	//@NotEmpty(message = "Product name isn't provided.")
 	private Date time;
 	
-	@NotNull
-	private int assets;
+	private String assets;
 
 	private String category;
 	
@@ -30,11 +29,11 @@ public class CostRequest {
 		this.time = time;
 	}
 
-	public int getAssets() {
+	public String getAssets() {
 		return assets;
 	}
 
-	public void setAssets(int assets) {
+	public void setAssets(String assets) {
 		this.assets = assets;
 	}
 

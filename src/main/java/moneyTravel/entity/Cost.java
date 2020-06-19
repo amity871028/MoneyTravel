@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Cost {
 	private String id;
 	private Date time;
-	private int assets;
+	private String assets;
 	private String category;
 	private int type;
 	private int cost;
@@ -25,10 +25,10 @@ public class Cost {
 	public void setTime(Date time) {
 		this.time = time;
 	}
-	public int getAssets() {
+	public String getAssets() {
 		return assets;
 	}
-	public void setAssets(int assets) {
+	public void setAssets(String assets) {
 		this.assets = assets;
 	}
 	public String getCategory() {

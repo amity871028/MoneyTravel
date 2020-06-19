@@ -156,6 +156,10 @@ async function newCost(){
 	if (document.forms['cost-form'].reportValidity()) {
 		const dateTime = document.getElementById('cost-datetime').value;
 		let timestamp = Date.parse(dateTime);
+		let assetsSelection = document.getElementById('assets');
+		let assetsSelectedIndex = assetsSelection.selectedIndex;
+		let assetsValue = assetsSelection.options[assetsSelectedIndex].value;
+		
 		let categorySelection = document.getElementById('category');
 		let categorySelectedIndex = categorySelection.selectedIndex;
 		let categoryValue = categorySelection.options[categorySelectedIndex].value;
@@ -165,7 +169,7 @@ async function newCost(){
 		if(Object.keys(category).find(element => element == categoryValue)) cost *= -1;
 		const result = await FetchData.post(costAPI.new, {
 			time: timestamp,
-			assets: document.getElementById('assets').selectedIndex,
+			assets: assetsValue,
 			category: categoryValue,
 			type: document.getElementById('type').selectedIndex,
 			cost: cost,
