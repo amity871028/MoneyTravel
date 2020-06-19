@@ -11,7 +11,9 @@ async function newAssets(){
             currency: window.exchangeRate
         });
         if(result.status == 201){
-			alert('新增成功！');
+            alert('新增成功！');
+            $("#add-assets-modal").modal('hide');
+            //getAssets();
 		}
 		else {
 			alert('請再試一次！');
@@ -47,7 +49,7 @@ async function updateExchangeRate(){
 }
 
 function init(){
-    //getCost();
+    //getAssets();
     initialCountry();
     //updateType();
     

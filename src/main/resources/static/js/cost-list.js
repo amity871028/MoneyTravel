@@ -173,6 +173,8 @@ async function newCost(){
 		});
 		if(result.status == 201){
 			alert('新增成功！');
+			$("#add-cost-modal").modal('hide');
+			getCost();
 		}
 		else {
 			alert('請再試一次！');
