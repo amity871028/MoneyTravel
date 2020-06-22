@@ -2,6 +2,10 @@
     background-color: lightgoldenrodyellow;
 }
 
+#list tbody {
+    cursor: pointer;
+}
+
 .assets {
     font-size: smaller;
     color: gray;

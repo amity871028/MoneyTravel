@@ -18,7 +18,7 @@
 
 <body>
     <div class="Splitter"> </div>
-    <a href="#add-cost-modal" data-toggle="modal">
+    <a href="#add-cost-modal" data-toggle="modal" onclick="clearModal()">
         <div class="fixed-icon">+</div>
     </a>
     <h1>帳單</h1>
@@ -64,9 +64,7 @@
 
                         <div class="form-group">
                             資產：
-                            <select id="assets">
-                                <option value="5eeb8466a9139f71d5fd913f">日常花費</option>
-                            </select>
+                            <select id="assets"></select>
                         </div>
                         <div class="form-group">
                             類別：
@@ -95,10 +93,8 @@
                         </div>
 
                         <button type="button" class="btn btn-primary" id="add-cost-btn">新增</button>
-                        <button type="button" class="btn btn-primary" id="update-cost-btn"
-                            style="display: none;">修改</button>
-                        <button type="button" class="btn btn-primary" id="delete-cost-btn"
-                            style="display: none;">刪除</button>
+                        <button type="button" class="btn btn-primary" id="update-cost-btn" style="display: none;">修改</button>
+                        <button type="button" class="btn btn-primary" id="delete-cost-btn" style="display: none;">刪除</button>
                         <span id="cost-id" style="display: none">-1</span>
                     </form>
 

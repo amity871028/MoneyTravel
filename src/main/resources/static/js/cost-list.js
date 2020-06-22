@@ -1,6 +1,7 @@
 const costAPI = {
 	all: "cost",
-	new: "cost/new"
+	new: "cost/new",
+	assets: "assets"
 };
 
 const incomeCategory = {
@@ -53,7 +54,7 @@ async function getCost(){
 			const tmpTable = document.createElement('table');
 			tmpTable.setAttribute('class', "table table-hover");
 			tmpTable.id = `table-${date}`;
-			tmpTable.innerHTML = `<thead><tr>
+			tmpTable.innerHTML = `<thead><tr onclick="updateCostModal('${eachCost.id}')">
 					<th colspan="2"><span class="date">${date}</span><span class="badge badge-primary">${weeks[week]}</span>
 					</th>
 					<th class="income">$ <span id="income-${date}">0</span></th>
@@ -76,8 +77,8 @@ async function getCost(){
 		else {
 			tmpCostTd = `<td>$ ${parseInt(eachCost.cost)}</td>`;
 		}
-		let tmp = `<tr id="${eachCost.id}" onclick="updateCost('${eachCost.id}')">${tmpCategoryTd}
-				<td>${eachCost.description}<br><span class="assets">日常花費</span>
+		let tmp = `<tr id="${eachCost.id}" onclick="updateCostModal('${eachCost.id}')">${tmpCategoryTd}
+				<td>${eachCost.description}<br><span class="assets">${eachCost.assets}</span>
 				</td>
 				<td></td>
 				${tmpCostTd}
@@ -114,51 +115,46 @@ async function getCost(){
 	sum.innerHTML = parseInt(sumIncome) - parseInt(sumCost);
 }
 
-async function updateCost(id){
-	const result = await FetchData.put(`${costAPI.all}/${id}/update`, {
-		id: id,
-		time: new Date(),
-		assets: 0,
-		category: 'pocketMoney',
-		type: -1,
-		cost: 300,
-		description: "test"
-	});
-	//$('#add-cost-modal').modal('show');
-	/*if (document.forms['cost-form'].reportValidity()) {
-		const dateTime = document.getElementById('cost-datetime').value;
-		let timestamp = Date.parse(dateTime);
-		let categorySelection = document.getElementById('category');
-		let categorySelectedIndex = categorySelection.selectedIndex;
-		let categoryValue = categorySelection.options[categorySelectedIndex].value;
+async function updateCostModal(id){
+	const result = await FetchData.get(`${costAPI.all}/${id}`);
+	const detail = await result.json();
+	console.log(detail);
+	let date = new Date(detail.time).toLocaleDateString();
+	if(date.split('/')[1].length == 1) {
+		let tmp = '0' + date.split('/')[1];
+		date = `${date.split('/')[0]}/${tmp}/${date.split('/')[2]}`;
+	}
+	if(date.split('/')[2].length == 1) {
+		let tmp = '0' + date.split('/')[2];
+		date = `${date.split('/')[0]}/${date.split('/')[1]}/${tmp}`;
+	}
+	date = date.replace(new RegExp('/', 'g'), '-');
+	let time = new Date(detail.time).toTimeString().split(' ')[0];
+	document.getElementById('cost-datetime').value = `${date}T${time}`;
+	$("#assets").find(`option`).attr('selected',false);
+	$("#assets").find(`option:contains(${detail.assets})`).attr('selected',true);
+	$(`#category option`).attr('selected',false);
+	$(`#category option[value="${detail.category}"]`).attr('selected',true);
+	updateType();
+	$('#type option')[detail.type].selected = true; 
+	document.getElementById('cost-cost').value = parseInt(detail.cost * (-1));
+	document.getElementById('cost-description').value = detail.description;
 
-		let cost = parseInt(document.getElementById('cost-cost').value);
-		if(Object.keys(category).find(element => element == categoryValue)) cost *= -1;
-		const result = await FetchData.put(costAPI.new, {
-			id: id,
-			time: timestamp,
-			assets: document.getElementById('assets').selectedIndex,
-			category: categoryValue,
-			type: document.getElementById('type').selectedIndex,
-			cost: cost,
-			description: document.getElementById('cost-description').value
-		});
-		if(result.status == 201){
-			alert('新增成功！');
-		}
-		else {
-			alert('請再試一次！');
-		}
-	}*/
+	document.getElementById('add-cost-btn').setAttribute("style", "display: none");
+	document.getElementById('update-cost-btn').setAttribute("style", "display: initial");
+	document.getElementById('delete-cost-btn').setAttribute("style", "display: initial");
+	document.getElementById('cost-id').innerHTML = id;
+	$('#add-cost-modal').modal('show');
 }
 
 async function newCost(){
+	const idSpan = document.getElementById('cost-id');
 	if (document.forms['cost-form'].reportValidity()) {
 		const dateTime = document.getElementById('cost-datetime').value;
 		let timestamp = Date.parse(dateTime);
 		let assetsSelection = document.getElementById('assets');
 		let assetsSelectedIndex = assetsSelection.selectedIndex;
-		let assetsValue = assetsSelection.options[assetsSelectedIndex].value;
+		let assets = assetsSelection.options[assetsSelectedIndex].innerHTML;
 		
 		let categorySelection = document.getElementById('category');
 		let categorySelectedIndex = categorySelection.selectedIndex;
@@ -167,23 +163,85 @@ async function newCost(){
 		console.log(timestamp);
 		let cost = parseInt(document.getElementById('cost-cost').value);
 		if(Object.keys(category).find(element => element == categoryValue)) cost *= -1;
-		const result = await FetchData.post(costAPI.new, {
-			time: timestamp,
-			assets: assetsValue,
-			category: categoryValue,
-			type: document.getElementById('type').selectedIndex,
-			cost: cost,
-			description: document.getElementById('cost-description').value
-		});
-		if(result.status == 201){
-			alert('新增成功！');
-			$("#add-cost-modal").modal('hide');
-			getCost();
+		
+		if(idSpan.innerHTML == -1){
+			const result = await FetchData.post(costAPI.new, {
+				time: timestamp,
+				assets: assets,
+				category: categoryValue,
+				type: document.getElementById('type').selectedIndex,
+				cost: cost,
+				description: document.getElementById('cost-description').value
+			});
+			if(result.status == 201){
+				alert('新增成功！');
+				$("#add-cost-modal").modal('hide');
+				getCost();
+			}
+			else {
+				alert('請再試一次！');
+			}
 		}
 		else {
-			alert('請再試一次！');
+			const result = await FetchData.put(`${costAPI.all}/${idSpan.innerHTML}/update`, {
+				time: timestamp,
+				assets: assets,
+				category: categoryValue,
+				type: document.getElementById('type').selectedIndex,
+				cost: cost,
+				description: document.getElementById('cost-description').value
+			});
+			if(result.status == 200){
+				alert('修改成功！');
+				$("#add-cost-modal").modal('hide');
+				getCost();
+			}
+			else {
+				alert('請再試一次！');
+			}
+			idSpan.innerHTML = -1;
 		}
 	}
+}
+
+async function deleteCost(){
+	const idSpan = document.getElementById('cost-id');
+	const result = await FetchData.delete(`${costAPI.all}/${idSpan.innerHTML}/delete`);
+	if(result.status == 204){
+		alert('刪除成功！');
+		getCost();
+	}	
+	else {
+		alert('請再試一次！');
+	}
+	$('#add-cost-modal').modal('hide');
+}
+function clearModal(){
+	console.log("!!");
+	document.getElementById('cost-datetime').value = "";
+	$("#assets").find(`option`).attr('selected',false);
+	$('#assets option')[0].selected = true; 
+	$(`#category option`).attr('selected',false);
+	$("#category").find(`option:contains(食物)`).attr('selected',true);
+	updateType();
+	document.getElementById('cost-cost').value = "";
+	document.getElementById('cost-description').value = "";
+
+	document.getElementById('add-cost-btn').setAttribute('style', 'display: initial;');
+	document.getElementById('update-cost-btn').setAttribute('style', 'display: none;');
+	document.getElementById('delete-cost-btn').setAttribute('style', 'display: none;');
+}
+
+async function updateAssets(){
+	const assetsSelection = document.getElementById('assets');
+	const result = await FetchData.get(costAPI.assets);
+	const json = await result.json();
+	json.forEach(assets =>{
+		let option = document.createElement("option");
+		option.text = assets.name;
+		option.value = assets.id;
+		assetsSelection.add(option);
+	});
 }
 
 function updateType(){
@@ -260,6 +318,7 @@ function initialDate(){
 function init(){
 	initialDate();
 	getCost();
+	updateAssets();
 	updateType();
 	
 	document.getElementById('prev').addEventListener('click', function(){changeMonth('prev')});
@@ -271,6 +330,8 @@ function init(){
 	document.getElementById('category').addEventListener('change', updateType);
 
 	document.getElementById('add-cost-btn').addEventListener('click', newCost);
+	document.getElementById('update-cost-btn').addEventListener('click', newCost);
+	document.getElementById('delete-cost-btn').addEventListener('click', deleteCost);
 }
 
 window.addEventListener('load', init);
