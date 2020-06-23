@@ -65,7 +65,7 @@ async function getCost(){
 		const tbody = document.getElementById(`tbody-${date}`);
 		
 		let tmpCostTd = "";
-		let tmpCategoryTd
+		let tmpCategoryTd;
 		if(eachCost.cost > 0) {
 			tmpCategoryTd = `<td>${incomeCategory[eachCost.category]}<br> </td>`;
 			tmpCostTd = `<td class="income">$ ${parseInt(eachCost.cost)}</td>`;
@@ -214,10 +214,10 @@ async function deleteCost(){
 	else {
 		alert('請再試一次！');
 	}
+	idSpan.innerHTML = -1;
 	$('#add-cost-modal').modal('hide');
 }
 function clearModal(){
-	console.log("!!");
 	document.getElementById('cost-datetime').value = "";
 	$("#assets").find(`option`).attr('selected',false);
 	$('#assets option')[0].selected = true; 
@@ -230,6 +230,8 @@ function clearModal(){
 	document.getElementById('add-cost-btn').setAttribute('style', 'display: initial;');
 	document.getElementById('update-cost-btn').setAttribute('style', 'display: none;');
 	document.getElementById('delete-cost-btn').setAttribute('style', 'display: none;');
+	
+	document.getElementById(`cost-id`).innerHTML = -1;
 }
 
 async function updateAssets(){

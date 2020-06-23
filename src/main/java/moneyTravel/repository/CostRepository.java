@@ -10,5 +10,6 @@ import moneyTravel.entity.Cost;
 
 @Repository
 public interface CostRepository extends MongoRepository<Cost, String> {
-	List<Cost> findAll(Sort sort); 
+	List<Cost> findAll(Sort sort);
+	List<Cost> findByAssets(String assetsName); 
 }

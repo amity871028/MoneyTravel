@@ -10,4 +10,6 @@ import moneyTravel.entity.Assets;
 
 @Repository
 public interface AssetsRepository extends MongoRepository<Assets, String> {
+
+	Assets findByName(String name);
 }

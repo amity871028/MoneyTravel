@@ -10,19 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
+import moneyTravel.entity.Assets;
+import moneyTravel.entity.AssetsCosts;
 import moneyTravel.entity.Cost;
 import moneyTravel.entity.CostRequest;
-//import ntou.cs.springboot.exception.NotFoundException;
 import moneyTravel.repository.CostRepository;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.GregorianCalendar;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 @Service
 public class CostService {
@@ -32,6 +30,10 @@ public class CostService {
 	
 	@Autowired
 	private CostRepository repository;
+	
+
+	@Autowired
+	private AssetsService assetsService;
 	
 	public CostService(CostRepository repository) {
 		this.repository = repository;
@@ -110,7 +112,65 @@ public class CostService {
 		return repository.save(cost);
 		
 	}
-	public void deleteNote(String id) {
+	
+	public void deleteCost(String id) {
 		repository.deleteById(id);
+	}
+	
+	public List<AssetsCosts> getAssetsCost(){
+		Sort.Direction direction = Sort.Direction.DESC;
+		Sort sort = null;
+		sort = Sort.by(direction, "assets");
+		List<Cost> allCost = repository.findAll(sort);
+	
+		List<AssetsCosts> assetsCosts = new ArrayList<AssetsCosts>();
+		String tmpAssetsName = "";
+		int sum = 0;
+		AssetsCosts tmp = new AssetsCosts();
+		for(int i = 0; i < allCost.size(); i++) {			
+			if(!allCost.get(i).getAssets().equals(tmpAssetsName)) {
+				if(i != 0) {
+					assetsCosts.add(tmp);
+				}
+				tmp = new AssetsCosts();
+				Assets assets = assetsService.findByName(allCost.get(i).getAssets());
+				tmp.setAssetsId(assets.getId());
+				tmp.setAssets(allCost.get(i).getAssets());
+				tmp.setTotalCost(allCost.get(i).getCost());
+				tmpAssetsName = allCost.get(i).getAssets();
+			}
+			else {
+				tmp.setTotalCost(tmp.getTotalCost() + allCost.get(i).getCost());
+			}
+			if(i == allCost.size() - 1) assetsCosts.add(tmp);
+		}
+		return assetsCosts;
+	}
+	
+	public List<Cost> findByAssets(String assetsName){
+		return repository.findByAssets(assetsName);
+	}
+	
+	public void replaceAssets(String oldName, String newName) throws NotFoundException{
+		
+		List<Cost> costs = findByAssets(oldName);
+		System.out.println(costs);
+		for(int i = 0; i < costs.size(); i++) {
+			CostRequest request = new CostRequest();
+			request.setTime(costs.get(i).getTime());
+			request.setAssets(newName);
+			request.setCategory(costs.get(i).getCategory());
+			request.setType(costs.get(i).getType());
+			request.setCost(costs.get(i).getCost());
+			request.setDescription(costs.get(i).getDescription());
+			replaceCost(costs.get(i).getId(), request);
+		}
+	}
+	
+	public void deleteCostsContainAssetsName(String assetsName) {
+		List<Cost> costs = findByAssets(assetsName);
+		for(int i = 0; i < costs.size(); i++) {
+			deleteCost(costs.get(i).getId());
+		}
 	}
 }

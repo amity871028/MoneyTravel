@@ -18,7 +18,7 @@
 
 <body>
     <div class="Splitter"> </div>
-    <a href="#add-assets-modal" data-toggle="modal">
+    <a href="#add-assets-modal" data-toggle="modal" onclick="clearModal();">
         <div class="fixed-icon">+</div>
     </a>
     <h1>資產</h1>
@@ -33,24 +33,15 @@
         </thead>
         <tbody>
             <tr>
-                <td>0</td>
-                <td>22</td>
-                <td>-22</td>
+                <td id="positive" class="income">0</td>
+                <td id="negative" class="cost">0</td>
+                <td id="total">0</td>
             </tr>
         </tbody>
     </table>
     <hr>
     <table class="table table-hover">
-        <tbody>
-            <tr>
-                <td>日常花費</td>
-                <td>$ 22</td>
-            </tr>
-            <tr>
-                <td>信用卡</td>
-                <td>$ 0</td>
-            </tr>
-        </tbody>
+        <tbody id="assets-tbody"></tbody>
     </table>
     
 
@@ -70,7 +61,7 @@
                         </div>
 
                         <div class="form-group">
-                            總額：<input type="number" id="assets-imcome" required>
+                            總額：<input type="number" id="assets-money" required>
                         </div>
                         <div class="form-group">
                             貨幣：

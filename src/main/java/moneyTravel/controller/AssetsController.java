@@ -31,14 +31,15 @@ public class AssetsController {
 	@Autowired
 	private AssetsService assetsService;
 	
-	@GetMapping(value = "/hello")
-	public String hello() {
-		return "hello";
-	}
-
 	@GetMapping
-	public ResponseEntity<List<Assets>> getAssets() {
+	public ResponseEntity<List<Assets>> findAssets() {
 		List<Assets> assets = assetsService.getAllAssets();
+		return ResponseEntity.ok(assets);
+	}
+	
+	@GetMapping(value = "/{id}")
+	public ResponseEntity<Assets> getAssets(@PathVariable("id") String id) throws NotFoundException {
+		Assets assets = assetsService.getAssets(id);
 		return ResponseEntity.ok(assets);
 	}
 
@@ -63,7 +64,7 @@ public class AssetsController {
 	}
 	
 	@DeleteMapping(value = "/{id}/delete")
-	public ResponseEntity<Cost> deleteAssets(@PathVariable("id") String id){
+	public ResponseEntity<Cost> deleteAssets(@PathVariable("id") String id) throws NotFoundException{
 		assetsService.deleteAssets(id);
 		return ResponseEntity.noContent().build();
 	}

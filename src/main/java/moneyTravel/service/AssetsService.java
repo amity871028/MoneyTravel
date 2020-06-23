@@ -24,7 +24,9 @@ public class AssetsService {
 
 	@Autowired
 	private AssetsRepository repository;
-	
+
+	@Autowired
+	private CostService costService;
 	public AssetsService(AssetsRepository repository) {
 		this.repository = repository;
 	}
@@ -54,10 +56,15 @@ public class AssetsService {
 		assets.setCurrency(request.getCurrency());
 		assets.setCurrencyCountry(request.getCurrencyCountry());
 		
+		costService.replaceAssets(oldAssets.getName(), request.getName());
+		
 		return repository.save(assets);
 	}
 	
-	public void deleteAssets(String id) {
+	public void deleteAssets(String id) throws NotFoundException {
+		Assets assets = getAssets(id);
+		costService.deleteCostsContainAssetsName(assets.getName());
+		
 		repository.deleteById(id);
 	}
 	
@@ -96,5 +103,10 @@ public class AssetsService {
 			countries.add(country);
 		}
 		return countries;
+	}
+	
+	public Assets findByName(String name) {
+		Assets assets = repository.findByName(name);
+		return assets;
 	}
 }

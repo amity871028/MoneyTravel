@@ -22,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 
+import moneyTravel.entity.AssetsCosts;
 import moneyTravel.entity.Cost;
 import moneyTravel.entity.CostRequest;
 import moneyTravel.service.CostService;
@@ -63,8 +64,15 @@ public class CostController{
 	}
 	
 	@DeleteMapping(value = "/{id}/delete")
-	public ResponseEntity<Cost> deleteNote(@PathVariable("id") String id){
-		costService.deleteNote(id);
+	public ResponseEntity<Cost> deleteCost(@PathVariable("id") String id){
+		costService.deleteCost(id);
 		return ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping(value = "/assetsCost")
+	public ResponseEntity<List<AssetsCosts>> getAssetsCost(){
+		List<AssetsCosts> AssetsCosts = costService.getAssetsCost();
+		return ResponseEntity.ok(AssetsCosts);
+		
 	}
 }
