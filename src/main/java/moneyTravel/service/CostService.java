@@ -118,31 +118,25 @@ public class CostService {
 	}
 	
 	public List<AssetsCosts> getAssetsCost(){
+		List<Assets> allAssets = assetsService.getAllAssets();
+		List<AssetsCosts> assetsCosts = new ArrayList<AssetsCosts>();
+		for(int i = 0; i < allAssets.size(); i++) {
+			AssetsCosts tmp = new AssetsCosts();
+			tmp.setAssetsId(allAssets.get(i).getId());
+			tmp.setAssets(allAssets.get(i).getName());
+			tmp.setTotalCost(0);
+			assetsCosts.add(tmp);
+		}
 		Sort.Direction direction = Sort.Direction.DESC;
 		Sort sort = null;
 		sort = Sort.by(direction, "assets");
-		List<Cost> allCost = repository.findAll(sort);
-	
-		List<AssetsCosts> assetsCosts = new ArrayList<AssetsCosts>();
-		String tmpAssetsName = "";
-		int sum = 0;
-		AssetsCosts tmp = new AssetsCosts();
-		for(int i = 0; i < allCost.size(); i++) {			
-			if(!allCost.get(i).getAssets().equals(tmpAssetsName)) {
-				if(i != 0) {
-					assetsCosts.add(tmp);
+		List<Cost> allCosts = repository.findAll(sort);
+		for(int i = 0; i < assetsCosts.size(); i++) {
+			for(int j = 0 ; j < allCosts.size(); j++) {
+				if(assetsCosts.get(i).getAssets().equals(allCosts.get(j).getAssets())) {
+					assetsCosts.get(i).setTotalCost(assetsCosts.get(i).getTotalCost() + allCosts.get(j).getCost());
 				}
-				tmp = new AssetsCosts();
-				Assets assets = assetsService.findByName(allCost.get(i).getAssets());
-				tmp.setAssetsId(assets.getId());
-				tmp.setAssets(allCost.get(i).getAssets());
-				tmp.setTotalCost(allCost.get(i).getCost());
-				tmpAssetsName = allCost.get(i).getAssets();
 			}
-			else {
-				tmp.setTotalCost(tmp.getTotalCost() + allCost.get(i).getCost());
-			}
-			if(i == allCost.size() - 1) assetsCosts.add(tmp);
 		}
 		return assetsCosts;
 	}

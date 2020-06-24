@@ -91,7 +91,7 @@ public class AssetsService {
 			country.setCountryEN(CountryEN[i]);
 			country.setCountryCH(CountryCH[i]);
 			if(i == 1) {
-				double exchangeRate  = (double)(Math.round(USAToTaiwanExchangeRate*10000))/10000;
+				double exchangeRate  = (double)Math.round(10000 / USAToTaiwanExchangeRate)/10000;
 				country.setExchangeRate(exchangeRate);
 			}
 			else {

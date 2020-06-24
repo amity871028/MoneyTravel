@@ -36,11 +36,20 @@ const categoryToType = {
 	another: [""]
 }
 
+const currencyName = ["台幣", "美金", "歐元", "日幣", "港幣", "英鎊", "人民幣", "韓幣(南韓)"];
+const currencySymbol = ["$", "US$", "€", "JP¥", "HK$", "£", "CN¥", "₩"];
 const weeks = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+
 async function getCost(){
+	document.getElementById('sum').innerHTML = 0;
+	document.getElementById('sum-cost').innerHTML = 0;
+	document.getElementById('sum-income').innerHTML = 0;
+
+	let result = await FetchData.get(costAPI.assets);
+	let assetsJson = await result.json();
+
 	const monthnYear = document.getElementById('date-title').innerHTML;
-	console.log(monthnYear);
-	const result = await FetchData.get(`${costAPI.all}?date=${monthnYear}`);
+	result = await FetchData.get(`${costAPI.all}?date=${monthnYear}`);
 	let json = await result.json();
 
 	const listDiv = document.getElementById('list');
@@ -66,16 +75,62 @@ async function getCost(){
 		
 		let tmpCostTd = "";
 		let tmpCategoryTd;
+		let symbol = "";
+		let toNTDollar = 0;
+		assetsJson.forEach(eachAssets => {
+			if(eachCost.assets == eachAssets.name){
+				let index = currencyName.findIndex(element => element == eachAssets.currencyCountry);
+				if(index == 0) {
+					return;
+				}
+				symbol = currencySymbol[index];
+				toNTDollar = (eachCost.cost / eachAssets.currency).toFixed(2);
+			}
+		});
+		
+		if(toNTDollar == 0) tmpCostTd = `<td>$ 0</td>`;
+		else tmpCostTd = `<td>${symbol} 0 ($ 0)</td>`;
+
 		if(eachCost.cost > 0) {
 			tmpCategoryTd = `<td>${incomeCategory[eachCost.category]}<br> </td>`;
-			tmpCostTd = `<td class="income">$ ${parseInt(eachCost.cost)}</td>`;
+			if(toNTDollar == 0) tmpCostTd = `<td class="income">$ ${parseFloat(eachCost.cost)}</td>`;
+			else tmpCostTd = `<td class="income">${symbol} ${parseFloat(eachCost.cost)} ($ ${toNTDollar})</td>`;
+
+			const income = document.getElementById(`income-${date}`);
+			const sumIncome = document.getElementById('sum-income');
+			let tmpCost1 = parseFloat(income.innerHTML);
+			let tmpCost2 = parseFloat(sumIncome.innerHTML);
+			if(toNTDollar == 0) {
+				tmpCost1 += parseFloat(eachCost.cost);
+				tmpCost2 += parseFloat(eachCost.cost);
+			}
+			else {
+				tmpCost1 += parseFloat(toNTDollar);
+				tmpCost2 += parseFloat(toNTDollar);
+			}
+			income.innerHTML = tmpCost1.toFixed(2);
+			sumIncome.innerHTML = tmpCost2.toFixed(2);
 		}
 		else if(eachCost.cost < 0){
 			tmpCategoryTd = `<td>${category[eachCost.category]}<br>${categoryToType[eachCost.category][eachCost.type]}</td>`;
-			tmpCostTd = `<td class="cost">$ ${parseInt(eachCost.cost)*(-1)}</td>`;
-		}
-		else {
-			tmpCostTd = `<td>$ ${parseInt(eachCost.cost)}</td>`;
+			if(toNTDollar == 0) tmpCostTd = `<td class="cost">$ ${parseFloat(eachCost.cost)*(-1)}</td>`;
+			else  tmpCostTd = `<td class="cost">${symbol} ${parseFloat(eachCost.cost)*(-1)} ($ ${toNTDollar*(-1)})</td>`;
+		
+			const cost = document.getElementById(`cost-${date}`);
+			const sumCost = document.getElementById('sum-cost');
+			let tmpCost1 = parseFloat(cost.innerHTML);
+			let tmpCost2 = parseFloat(sumCost.innerHTML);
+			if(toNTDollar == 0) {
+				tmpCost1 -= eachCost.cost;
+				tmpCost2 -= eachCost.cost;
+			}
+			else {
+				tmpCost1 -= toNTDollar;
+				tmpCost2 -= toNTDollar;
+			}
+			cost.innerHTML = tmpCost1.toFixed(2);
+			sumCost.innerHTML = tmpCost2.toFixed(2);
+		
 		}
 		let tmp = `<tr id="${eachCost.id}" onclick="updateCostModal('${eachCost.id}')">${tmpCategoryTd}
 				<td>${eachCost.description}<br><span class="assets">${eachCost.assets}</span>
@@ -83,42 +138,18 @@ async function getCost(){
 				<td></td>
 				${tmpCostTd}
 			</tr>`;
-		
-		if(eachCost.cost < 0) {
-			const cost = document.getElementById(`cost-${date}`);
-			let tmpCost = parseInt(cost.innerHTML);
-			tmpCost -= eachCost.cost;
-			cost.innerHTML = tmpCost;
-
-			const sumCost = document.getElementById('sum-cost');
-			tmpCost = parseInt(sumCost.innerHTML);
-			tmpCost -= eachCost.cost;
-			sumCost.innerHTML = tmpCost;
-		}
-		else {
-			const income = document.getElementById(`income-${date}`);
-			let tmpCost = parseInt(income.innerHTML);
-			tmpCost += eachCost.cost;
-			income.innerHTML = tmpCost;
 			
-			const sumIncome = document.getElementById('sum-income');
-			tmpCost = parseInt(sumIncome.innerHTML);
-			tmpCost += eachCost.cost;
-			sumIncome.innerHTML = tmpCost;
-		}
-
 	tbody.innerHTML += tmp;
 	});
 	const sum = document.getElementById('sum');
 	const sumCost = document.getElementById('sum-cost').innerHTML;
 	const sumIncome = document.getElementById('sum-income').innerHTML;
-	sum.innerHTML = parseInt(sumIncome) - parseInt(sumCost);
+	sum.innerHTML = parseFloat(sumIncome) - parseFloat(sumCost);
 }
 
 async function updateCostModal(id){
 	const result = await FetchData.get(`${costAPI.all}/${id}`);
 	const detail = await result.json();
-	console.log(detail);
 	let date = new Date(detail.time).toLocaleDateString();
 	if(date.split('/')[1].length == 1) {
 		let tmp = '0' + date.split('/')[1];
@@ -137,7 +168,8 @@ async function updateCostModal(id){
 	$(`#category option[value="${detail.category}"]`).attr('selected',true);
 	updateType();
 	$('#type option')[detail.type].selected = true; 
-	document.getElementById('cost-cost').value = parseInt(detail.cost * (-1));
+	if(detail.cost < 0)document.getElementById('cost-cost').value = parseFloat(detail.cost * (-1));
+	else document.getElementById('cost-cost').value = detail.cost;
 	document.getElementById('cost-description').value = detail.description;
 
 	document.getElementById('add-cost-btn').setAttribute("style", "display: none");
@@ -160,10 +192,11 @@ async function newCost(){
 		let categorySelectedIndex = categorySelection.selectedIndex;
 		let categoryValue = categorySelection.options[categorySelectedIndex].value;
 
-		console.log(timestamp);
 		let cost = parseInt(document.getElementById('cost-cost').value);
-		if(Object.keys(category).find(element => element == categoryValue)) cost *= -1;
-		
+		if(Object.keys(category).find(element => element == categoryValue)) {
+			if(categoryValue == "another" && categorySelectedIndex != 8) ;
+			else cost *= -1;
+		}
 		if(idSpan.innerHTML == -1){
 			const result = await FetchData.post(costAPI.new, {
 				time: timestamp,
@@ -283,7 +316,6 @@ function changeMonth(action){
 }
 
 function updateModal(action){
-	console.log(action);
 	const categorySelection = document.getElementById('category');
 	const typeSelection = document.getElementById('type');
 	categorySelection.options.length = 0;

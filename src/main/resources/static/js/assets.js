@@ -6,10 +6,14 @@ const assetsAPI = {
     newCost: "cost/new"
 }
 
+const currencyName = ["台幣", "美金", "歐元", "日幣", "港幣", "英鎊", "人民幣", "韓幣(南韓)"];
+const currencySymbol = ["$", "US$", "€", "JP¥", "HK$", "£", "CN¥", "₩"];
+
 async function getAssets(){
-    const result = await FetchData.get(assetsAPI.all);
+    let result = await FetchData.get(assetsAPI.all);
     const json = await result.json();
 
+    console.log(json);
     const assetsTbody = document.getElementById('assets-tbody');
     const negative = document.getElementById('negative');
     negative.innerHTML = 0;
@@ -18,25 +22,55 @@ async function getAssets(){
     const total = document.getElementById('total');
     total.innerHTML = 0;
     let tmp = "";
-    json.forEach(assets => {
+    for(let assets of json){
+        console.log(assets);
+    //json.forEach(assets => {
+        result = await FetchData.get(`${assetsAPI.one}/${assets.assetsId}`);
+        const detail = await result.json();
+        console.log(detail);
+		let symbol = "";
+		let toNTDollar = 0;
+		
+        let index = currencyName.findIndex(element => element == detail.currencyCountry);
+        if(index != 0) {
+            symbol = currencySymbol[index];
+            toNTDollar = (assets.totalCost / detail.currency).toFixed(2);
+            console.log(toNTDollar);
+        }
+		
         let totalCost = 0;
-        let tmpTotalCostTd = `<td>$ ${assets.totalCost}</td>`;
+        let tmpTotalCostTd = "";
+        if(toNTDollar == 0) tmpTotalCostTd = `<td>$ 0</td>`;
+        else tmpTotalCostTd = `<td>${symbol} 0 ($ 0)</td>`
+
         if(assets.totalCost < 0){
-            totalCost = assets.totalCost * (-1);
-            tmpTotalCostTd = `<td class="cost">$ ${totalCost}</td>`;
-            negative.innerHTML = parseInt(negative.innerHTML) + totalCost;
+            if(toNTDollar == 0) {
+                tmpTotalCostTd = `<td class="cost">$ ${assets.totalCost * (-1)}</td>`;
+                negative.innerHTML = parseFloat(negative.innerHTML) - assets.totalCost;
+            }
+            else {
+                tmpTotalCostTd = `<td class="cost">${symbol} ${assets.totalCost * (-1)} ($ ${toNTDollar*(-1)})</td>`;
+                negative.innerHTML = parseFloat(negative.innerHTML) - toNTDollar;
+            }
         }
         else if(assets.totalCost > 0){
-            tmpTotalCostTd = `<td class="income">$ ${assets.totalCost}</td>`;
-            positive.innerHTML = parseInt(positive.innerHTML) + assets.totalCost;
+            if(toNTDollar == 0) {
+                tmpTotalCostTd = `<td class="income">$ ${assets.totalCost}</td>`;
+                positive.innerHTML = parseFloat(positive.innerHTML) + assets.totalCost;
+            }
+            else {
+                tmpTotalCostTd = `<td class="income">${symbol} ${assets.totalCost} ($ ${toNTDollar})</td>`;
+                positive.innerHTML = parseFloat(positive.innerHTML) + toNTDollar;
+            }
         }
         tmp += `<tr onclick="updateAssetsModal('${assets.assetsId}', ${assets.totalCost})">
                 <td>${assets.assets}</td>
                 ${tmpTotalCostTd}
             </tr>`;
-    });
+    //});
+    }
     assetsTbody.innerHTML = tmp;
-    total.innerHTML = parseInt(positive.innerHTML) - parseInt(negative.innerHTML);
+    total.innerHTML = parseFloat(positive.innerHTML) - parseFloat(negative.innerHTML);
 
 }
 
