@@ -23,6 +23,7 @@ import java.net.URI;
 
 import moneyTravel.entity.Assets;
 import moneyTravel.entity.AssetsRequest;
+import moneyTravel.entity.Cost;
 import moneyTravel.entity.Diary;
 import moneyTravel.entity.DiaryRequest;
 import moneyTravel.service.DiaryService;
@@ -36,8 +37,15 @@ public class DiaryController {
 
 	
 	@GetMapping
-	public ResponseEntity<List<Diary>> findDiary() {
-		List<Diary> diaries = diaryService.getAllDiary();
+	public ResponseEntity<List<Diary>> findDiary(@RequestParam("date") String date) {
+		List<Diary> diaries = diaryService.getDiaries(date);
+		return ResponseEntity.ok(diaries);
+	}
+	
+
+	@GetMapping(value = "/{id}")
+	public ResponseEntity<Diary> getDiary(@PathVariable("id") String id) throws NotFoundException {
+		Diary diaries = diaryService.getDiary(id);
 		return ResponseEntity.ok(diaries);
 	}
 	
@@ -48,4 +56,11 @@ public class DiaryController {
 		return ResponseEntity.created(location).body(diary);
 		
 	}
+	
+	@DeleteMapping(value = "/{id}/delete")
+	public ResponseEntity<Diary> deleteCost(@PathVariable("id") String id){
+		diaryService.deleteDiary(id);
+		return ResponseEntity.noContent().build();
+	}
+	
 }

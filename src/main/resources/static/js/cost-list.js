@@ -144,7 +144,7 @@ async function getCost(){
 	const sum = document.getElementById('sum');
 	const sumCost = document.getElementById('sum-cost').innerHTML;
 	const sumIncome = document.getElementById('sum-income').innerHTML;
-	sum.innerHTML = parseFloat(sumIncome) - parseFloat(sumCost);
+	sum.innerHTML = (parseFloat(sumIncome) - parseFloat(sumCost)).toFixed(2);
 }
 
 async function updateCostModal(id){
@@ -165,9 +165,22 @@ async function updateCostModal(id){
 	$("#assets").find(`option`).attr('selected',false);
 	$("#assets").find(`option:contains(${detail.assets})`).attr('selected',true);
 	$(`#category option`).attr('selected',false);
-	$(`#category option[value="${detail.category}"]`).attr('selected',true);
-	updateType();
-	$('#type option')[detail.type].selected = true; 
+	if(Object.keys(incomeCategory).find(element => element == detail.category)) {
+		document.getElementById('income-tab').classList.add('active');
+		document.getElementById('cost-tab').classList.remove('active');
+		updateModal('income');
+		$(`#category option[value="${detail.category}"]`).attr('selected',true);
+		document.getElementById('type').setAttribute("style", "display: none;");
+	}
+	else {
+		document.getElementById('cost-tab').classList.add('active');
+		document.getElementById('income-tab').classList.remove('active');
+		updateModal('cost');
+		$(`#category option[value="${detail.category}"]`).attr('selected',true);
+		document.getElementById('type').setAttribute("style", "display: initial;");
+		updateType();
+		$('#type option')[detail.type].selected = true; 
+	}
 	if(detail.cost < 0)document.getElementById('cost-cost').value = parseFloat(detail.cost * (-1));
 	else document.getElementById('cost-cost').value = detail.cost;
 	document.getElementById('cost-description').value = detail.description;
@@ -251,6 +264,9 @@ async function deleteCost(){
 	$('#add-cost-modal').modal('hide');
 }
 function clearModal(){
+	document.getElementById('cost-tab').classList.add('active');
+	document.getElementById('income-tab').classList.remove('active');
+	updateModal('cost');
 	document.getElementById('cost-datetime').value = "";
 	$("#assets").find(`option`).attr('selected',false);
 	$('#assets option')[0].selected = true; 

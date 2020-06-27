@@ -13,7 +13,6 @@ async function getAssets(){
     let result = await FetchData.get(assetsAPI.all);
     const json = await result.json();
 
-    console.log(json);
     const assetsTbody = document.getElementById('assets-tbody');
     const negative = document.getElementById('negative');
     negative.innerHTML = 0;
@@ -23,11 +22,9 @@ async function getAssets(){
     total.innerHTML = 0;
     let tmp = "";
     for(let assets of json){
-        console.log(assets);
     //json.forEach(assets => {
         result = await FetchData.get(`${assetsAPI.one}/${assets.assetsId}`);
         const detail = await result.json();
-        console.log(detail);
 		let symbol = "";
 		let toNTDollar = 0;
 		
@@ -35,7 +32,6 @@ async function getAssets(){
         if(index != 0) {
             symbol = currencySymbol[index];
             toNTDollar = (assets.totalCost / detail.currency).toFixed(2);
-            console.log(toNTDollar);
         }
 		
         let totalCost = 0;
@@ -46,21 +42,21 @@ async function getAssets(){
         if(assets.totalCost < 0){
             if(toNTDollar == 0) {
                 tmpTotalCostTd = `<td class="cost">$ ${assets.totalCost * (-1)}</td>`;
-                negative.innerHTML = parseFloat(negative.innerHTML) - assets.totalCost;
+                negative.innerHTML = (parseFloat(negative.innerHTML) - assets.totalCost).toFixed(2);
             }
             else {
                 tmpTotalCostTd = `<td class="cost">${symbol} ${assets.totalCost * (-1)} ($ ${toNTDollar*(-1)})</td>`;
-                negative.innerHTML = parseFloat(negative.innerHTML) - toNTDollar;
+                negative.innerHTML = (parseFloat(negative.innerHTML) - toNTDollar).toFixed(2);
             }
         }
         else if(assets.totalCost > 0){
             if(toNTDollar == 0) {
                 tmpTotalCostTd = `<td class="income">$ ${assets.totalCost}</td>`;
-                positive.innerHTML = parseFloat(positive.innerHTML) + assets.totalCost;
+                positive.innerHTML = (parseFloat(positive.innerHTML) + assets.totalCost).toFixed(2);
             }
             else {
                 tmpTotalCostTd = `<td class="income">${symbol} ${assets.totalCost} ($ ${toNTDollar})</td>`;
-                positive.innerHTML = parseFloat(positive.innerHTML) + toNTDollar;
+                positive.innerHTML = (parseFloat(positive.innerHTML) + toNTDollar).toFixed(2);
             }
         }
         tmp += `<tr onclick="updateAssetsModal('${assets.assetsId}', ${assets.totalCost})">
@@ -70,7 +66,7 @@ async function getAssets(){
     //});
     }
     assetsTbody.innerHTML = tmp;
-    total.innerHTML = parseFloat(positive.innerHTML) - parseFloat(negative.innerHTML);
+    total.innerHTML = (parseFloat(positive.innerHTML) - parseFloat(negative.innerHTML)).toFixed(2);
 
 }
 
@@ -140,7 +136,6 @@ async function initialCountry(){
 async function updateAssetsModal(id, currentMoney){
     const result = await FetchData.get(`${assetsAPI.one}/${id}`);
     const detail = await result.json();
-    console.log(detail);
     document.getElementById('assets-name').value = detail.name;
     document.getElementById('assets-money').value = currentMoney;
     document.getElementById('assets-money').disabled = true;

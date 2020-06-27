@@ -1,0 +1,125 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>編輯日記</title>
+    <script src="js/navbar.js"></script>
+    <script src="js/lib/fetch-data.js"></script>
+    <link rel="stylesheet" href="css/all-setting.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/edit-diary.css">
+	<script src="js/edit-diary.js"></script>
+</head>
+
+<body>
+    <div class="Splitter"> </div>
+    <div class="edit-div">
+        <form id="diary-form">
+            <input type="date" id="date" required>
+        </form>
+        <div class="btn-div">
+            <button type="button" class="btn btn-primary" id="delete-diary-btn" style="display: none;">刪除日記</button>
+            <a type="button" class="btn btn-primary" href="#add-cost-modal" data-toggle="modal" id="new-cost-btn" onclick="clearModal()">新增記帳</a>
+            <a type="button" class="btn btn-primary" href="#check-cost-modal" data-toggle="modal" onclick="getCost()">查看記帳</a>
+            <button type="button" class="btn btn-primary" id="ok-btn">完成</button>
+            <a type="button" class="btn btn-primary" href="diary.html" id="back" style="display: none;">返回</a>
+        </div>
+        <br>
+        <input type="text" id="title" placeholder="標題">
+        <hr>
+        <!--<div class="textarea" contenteditable="true" placeholder="請輸入內容" id="description"></div>-->
+        <textarea class="textarea" id="description" placeholder="請輸入內容"></textarea>
+    </div>
+
+    <div class="modal fade" id="check-cost-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cost-title">查看記帳</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>分類</th>
+                                <th>描述</th>
+                                <th>金額</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cost-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="add-cost-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cost-title">記帳</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                      <a class="nav-item nav-link" id="income-tab" data-toggle="tab" href="#">收入</a>
+                      <a class="nav-item nav-link active" id="cost-tab" data-toggle="tab" href="#">支出</a>
+                     </div>
+                  </nav>
+                <div class="modal-body">
+                    <form id="cost-form">
+                        <div class="form-group">
+                            資產：
+                            <select id="assets"></select>
+                        </div>
+                        <div class="form-group">
+                            類別：
+                            <select id="category">
+                                <option value="food">食物</option>
+                                <option value="trafic">交通</option>
+                                <option value="entertainment">休閒娛樂</option>
+                                <option value="home">家居</option>
+                                <option value="dress">服飾</option>
+                                <option value="beauty">美容</option>
+                                <option value="healthy">健康</option>
+                                <option value="educate">教育</option>
+                                <option value="another">其他</option>
+                            </select>
+                            <select id="type"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cost-cost" class="col-form-label">金額：</label>
+                            <input type="number" id="cost-cost" class="form-control" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cost-description" class="col-form-label">內容：</label>
+                            <input type="text" id="cost-description" cols="30" rows="2" class="form-control">
+                        </div>
+
+                        <button type="button" class="btn btn-primary" id="add-cost-btn">新增</button>
+                        <button type="button" class="btn btn-primary" id="update-cost-btn" style="display: none;">修改</button>
+                        <button type="button" class="btn btn-primary" id="delete-cost-btn" style="display: none;">刪除</button>
+                        <span id="cost-id" style="display: none">-1</span>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</body>
+
+</html>

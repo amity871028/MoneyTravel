@@ -1,0 +1,36 @@
+.edit-div {
+    position: absolute;
+    right: 0;
+    left: 0;
+    margin: 0 auto;
+    width: 60%;
+}
+
+.btn-div {
+    float: right;
+}
+
+#diary-form {
+    display: inline-flex;
+}
+
+#title {
+    width: 100%;
+}
+
+.textarea {
+    border: solid 1px #bbb;
+    width: 100%;
+    height: 390px;
+    overflow-y: auto;
+    resize:none;
+}
+
+.assets {
+    font-size: smaller;
+    color: gray;
+}
+
+#cost-list {
+    cursor: pointer;
+}

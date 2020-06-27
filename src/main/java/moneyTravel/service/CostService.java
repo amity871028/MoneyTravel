@@ -76,7 +76,6 @@ public class CostService {
 			e.printStackTrace();
 		}
 		return result;
-		//return repository.findAll(sort);
 	}
 	
 	
@@ -92,9 +91,22 @@ public class CostService {
 		cost.setType(request.getType());
 		cost.setCost(request.getCost());
 		cost.setDescription(request.getDescription());
-		System.out.println(cost);
 		return repository.insert(cost);
 		
+	}
+	
+	public Cost creatCostGetId(CostRequest request) throws NotFoundException {
+		Cost cost = new Cost();
+		cost.setTime(request.getTime());
+		cost.setAssets(request.getAssets());
+		cost.setCategory(request.getCategory());
+		cost.setType(request.getType());
+		cost.setCost(request.getCost());
+		cost.setDescription(request.getDescription());
+		Cost retObject = repository.save(cost);
+		System.out.println(cost);
+		String id = retObject.getId();
+		return repository.findById(id).orElseThrow(() -> new NotFoundException());
 	}
 	
 	public Cost replaceCost(String costId, CostRequest request) throws NotFoundException {

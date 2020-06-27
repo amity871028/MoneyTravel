@@ -56,6 +56,14 @@ public class CostController{
 		return ResponseEntity.created(location).body(cost);
 		
 	}
+
+	@PostMapping(value = "/new/getId")
+	public ResponseEntity<Cost> createCostGetId(@Valid @RequestBody CostRequest request) throws NotFoundException{
+		Cost cost = costService.creatCostGetId(request);
+		
+		return ResponseEntity.ok(cost);
+		
+	}
 	
 	@PutMapping(value = "/{id}/update")
 	public ResponseEntity<Cost> replaceCost(@PathVariable("id") String id, @Valid @RequestBody CostRequest request) throws NotFoundException{
